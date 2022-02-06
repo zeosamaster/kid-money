@@ -1,45 +1,32 @@
-import Link from "next/link";
 import styles from "../styles/Home.module.css";
 
 export default function Actions() {
   return (
     <>
-      <Link href="/account/deposit">
-        <a className={styles.card}>
-          <h2>Deposit &rarr;</h2>
-          <p>Deposit your tokens to be able to save & compound 🏦</p>
-        </a>
-      </Link>
+      <div className={styles.card}>
+        <h2>🏦 Deposit</h2>
+        <p>Deposit your tokens to be able to save & compound</p>
+      </div>
 
-      <Link href="/account/withdraw">
-        <a href="https://nextjs.org/learn" className={styles.card}>
-          <h2>Withdraw &rarr;</h2>
-          <p>Withdraw tokens to convert them to money you can spend 💸</p>
-        </a>
-      </Link>
+      <div className={styles.card}>
+        <h2>💸 Withdraw</h2>
+        <p>Withdraw tokens to convert them to money you can spend</p>
+      </div>
 
-      <Link href="/account/save">
-        <a
-          href="https://github.com/vercel/next.js/tree/canary/examples"
-          className={styles.card}
-        >
-          <h2>Save &rarr;</h2>
-          <p>Save your tokens to get even more tokens! 💰</p>
-        </a>
-      </Link>
+      <div className={styles.card}>
+        <h2>💵 Save</h2>
+        <p>Save your tokens to get even more tokens</p>
+      </div>
 
-      <Link href="/account/unsave">
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          className={styles.card}
-        >
-          <h2>Unsave &rarr;</h2>
-          <p>
-            Take your tokens out of savings so you can decide what else to do
-            with them 💱
-          </p>
-        </a>
-      </Link>
+      <div className={styles.card}>
+        <h2>💱 Unsave</h2>
+        <p>Unsave your tokens so you can decide what else to do with them</p>
+      </div>
+
+      <div className={styles.card} style={{ gridColumn: "1 / span 2" }}>
+        <h2>💰 Compound</h2>
+        <p>Compound your locked savings to enjoy growing returns</p>
+      </div>
     </>
   );
 }
