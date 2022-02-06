@@ -25,6 +25,9 @@ export default function Header() {
         withdraw
         <br />
         <Image height={24} width={24} alt="save" src="/icons/save.svg" /> save +{" "}
+        <Image height={24} width={24} alt="compound" src="/icons/unsave.svg" />{" "}
+        unsave
+        <br />
         <Image
           height={24}
           width={24}

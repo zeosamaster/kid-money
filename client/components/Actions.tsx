@@ -31,7 +31,7 @@ export default function Actions() {
       </div>
 
       <div className={styles.card}>
-        <h2>💱 Unsave</h2>
+        <h2>💴 Unsave</h2>
         <p>Unsave your tokens so you can decide what else to do with them</p>
         <AmountForm onSubmit={unsave} />
       </div>
