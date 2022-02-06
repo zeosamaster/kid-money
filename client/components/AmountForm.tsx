@@ -10,7 +10,8 @@ export default function AmountForm({ onSubmit }: Props) {
     <Form onSubmit={onSubmit}>
       <input
         className={formStyles.amount}
-        type="text"
+        type="number"
+        step="any"
         name="amount"
         autoComplete="off"
         autoCorrect="off"
