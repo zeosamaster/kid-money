@@ -18436,18 +18436,12 @@
     "4": {
       "events": {},
       "links": {},
-      "address": "0xFFCb3F34495E5a393E1563d0d451a9E4803cf258",
-      "transactionHash": "0x6e48d2620832a857244ffba1ae35f78d9549b6fd42c3a6721ee8e1418879f894"
-    },
-    "5777": {
-      "events": {},
-      "links": {},
-      "address": "0x62d2D5340E3E153065AAc79EA94eA17a8D5474F0",
-      "transactionHash": "0x8508d3aff3c217e71a81b2db51141aa0d77408c522421027d9b25f91e8aaab49"
+      "address": "0x8F2fe1f8606AB280B36287E01678c5ffA27F992d",
+      "transactionHash": "0xd4721d71eccbf6897ef3538f540174b5b36a2524a25ecb8bec09ac5c9c42275d"
     }
   },
   "schemaVersion": "3.4.2",
-  "updatedAt": "2022-02-06T14:12:39.245Z",
+  "updatedAt": "2022-02-07T01:31:17.572Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "Store tokens and compound savings",
