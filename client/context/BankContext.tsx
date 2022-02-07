@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import React, { PropsWithChildren } from "react";
 import BankContract from "../contracts/Bank.json";
 import { getContract } from "../utils/metamask";
+import { TokenContext } from "./TokenContext";
 import { WalletContext } from "./WalletContext";
 
 interface AccountInfo {
@@ -33,6 +34,7 @@ export const BankContext = React.createContext<Bank>(initialBank);
 export function BankContextProvider({ children }: PropsWithChildren<{}>) {
   const { networkId, supportedNetwork, account } =
     React.useContext(WalletContext);
+  const { isApproved, approve } = React.useContext(TokenContext);
   const [bankContract, setBankContract] =
     React.useState<ethers.Contract | null>(null);
   const [accountInfo, setAccountInfo] = React.useState<AccountInfo | null>(
@@ -110,6 +112,10 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
           throw Error("Bank contract unavailable");
         }
 
+        if (!isApproved) {
+          await approve();
+        }
+
         const bigNumberAmount = ethers.utils.parseUnits(amount.toString(), 18);
         await bankContract.deposit(bigNumberAmount);
       } catch (e) {
@@ -117,7 +123,7 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
         throw e;
       }
     },
-    [bankContract]
+    [bankContract, isApproved, approve]
   );
 
   const withdraw = React.useCallback(
