@@ -1,10 +1,13 @@
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
+import Wallet from "./Wallet";
 
 export default function Header() {
   return (
     <>
       <h1 className={styles.title}>Welcome to Kid Money!</h1>
+
+      <Wallet />
 
       <p className={styles.description}>
         Here you&apos;ll be able to manage your money:
