@@ -22,11 +22,6 @@
   flex: 0 0 3rem;
   width: 3rem;
   height: 100%;
-  border-radius: 5px;
   font-size: 2rem;
   font-weight: 500;
-  border: 0;
-  background: #81e6d9;
-  color: #282e32;
-  cursor: pointer;
 }
