@@ -51,6 +51,10 @@
   border-bottom: 0;
 }
 
+.tokenAmount {
+  font-size: 2rem;
+}
+
 .card {
   display: flex;
   flex-direction: column;
