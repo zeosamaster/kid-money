@@ -9,10 +9,13 @@ export default function AccountCompound() {
 
   return (
     <>
-      <div className={styles.card} style={{ gridColumn: "1 / span 2" }}>
-        <h2>💰 Compound</h2>
-        <p>Compound your locked savings to enjoy growing returns</p>
-        <Form onSubmit={withForm(compound)} />
+      <h2>Compounding</h2>
+      <div className={styles.grid}>
+        <div className={styles.card} style={{ gridColumn: "1 / span 2" }}>
+          <h3>💰 Compound</h3>
+          <p>Compound your locked savings to enjoy growing returns</p>
+          <Form onSubmit={withForm(compound)} />
+        </div>
       </div>
     </>
   );

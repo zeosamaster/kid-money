@@ -21,7 +21,7 @@
 }
 
 .description {
-  margin: 4rem 0;
+  margin: 3rem 0;
   line-height: 1.5;
   font-size: 1.5rem;
 }
@@ -42,6 +42,13 @@
   grid-column-gap: 2rem;
   grid-row-gap: 2rem;
   max-width: 800px;
+  padding-bottom: 4rem;
+  margin: 2rem 0;
+  border-bottom: 2px lightgrey solid;
+}
+
+.grid:last-child {
+  border-bottom: 0;
 }
 
 .card {
@@ -65,7 +72,7 @@
   border-color: #0070f3;
 }
 
-.card h2 {
+.card h3 {
   margin: 0 0 1rem 0;
   font-size: 1.5rem;
 }

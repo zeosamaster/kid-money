@@ -9,16 +9,19 @@ export default function AccountBalance() {
 
   return (
     <>
-      <div className={styles.card}>
-        <h2>🏦 Deposit</h2>
-        <p>Deposit your tokens to be able to save & compound</p>
-        <AmountForm onSubmit={withFormAmount(deposit)} />
-      </div>
+      <h2>Account balance</h2>
+      <div className={styles.grid}>
+        <div className={styles.card}>
+          <h3>🏦 Deposit</h3>
+          <p>Deposit your tokens to be able to save & compound</p>
+          <AmountForm onSubmit={withFormAmount(deposit)} />
+        </div>
 
-      <div className={styles.card}>
-        <h2>💸 Withdraw</h2>
-        <p>Withdraw tokens to convert them to money you can spend</p>
-        <AmountForm onSubmit={withFormAmount(withdraw)} />
+        <div className={styles.card}>
+          <h3>💸 Withdraw</h3>
+          <p>Withdraw tokens to convert them to money you can spend</p>
+          <AmountForm onSubmit={withFormAmount(withdraw)} />
+        </div>
       </div>
     </>
   );

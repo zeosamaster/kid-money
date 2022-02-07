@@ -15,9 +15,7 @@ const Home: NextPage = () => {
 
       <Header />
 
-      <div className={styles.grid}>
-        <Actions />
-      </div>
+      <Actions />
     </>
   );
 };
