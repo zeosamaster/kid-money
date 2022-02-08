@@ -1,11 +1,19 @@
-import { ethers } from "ethers";
+import { ethers, EventFilter } from "ethers";
 import React, { PropsWithChildren } from "react";
 import BankContract from "../contracts/Bank.json";
 import TokenContract from "../contracts/Token.json";
+import useContractEventListeners, {
+  ContractEventListeners,
+} from "../hooks/useContractEventListeners";
 import { getContract } from "../utils/metamask";
 import { WalletContext } from "./WalletContext";
 
-interface Token {
+export enum TokenEvent {
+  APPROVAL = "Approval",
+  TRANSFER = "Transfer",
+}
+
+interface Token extends ContractEventListeners<TokenEvent> {
   balance: ethers.BigNumber | null;
   isApproved: boolean;
   approve: () => Promise<void>;
@@ -15,6 +23,8 @@ const initialToken: Token = {
   balance: null,
   isApproved: false,
   approve: () => Promise.reject(),
+  addEventListener: () => {},
+  removeEventListener: () => {},
 };
 
 export const TokenContext = React.createContext<Token>(initialToken);
@@ -26,6 +36,7 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
     React.useState<ethers.Contract | null>(null);
   const [balance, setBalance] = React.useState<ethers.BigNumber | null>(null);
   const [isApproved, setIsApproved] = React.useState<boolean>(false);
+  const { on, off } = useContractEventListeners<TokenEvent>(tokenContract);
 
   // token contract
   const getTokenContract = React.useCallback(async () => {
@@ -171,6 +182,42 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
     }
   }, [tokenContract, supportedNetwork, networkId]);
 
+  // listen to events
+  React.useEffect(() => {
+    if (!tokenContract || !account) {
+      return;
+    }
+
+    const transferFromTopic = [
+      ethers.utils.id("Transfer(address,address,uint256)"),
+      ethers.utils.hexZeroPad(account, 32),
+      null,
+      null,
+    ] as EventFilter["topics"];
+    const transferToTopic = [
+      ethers.utils.id("Transfer(address,address,uint256)"),
+      null,
+      ethers.utils.hexZeroPad(account, 32),
+      null,
+    ] as EventFilter["topics"];
+    const approvalTopic = [
+      ethers.utils.id("Approval(address,address,uint256)"),
+      ethers.utils.hexZeroPad(account, 32),
+      null,
+      null,
+    ] as EventFilter["topics"];
+
+    on({ topics: transferFromTopic }, getBalance);
+    on({ topics: transferToTopic }, getBalance);
+    on({ topics: approvalTopic }, getApproval);
+
+    return () => {
+      off({ topics: transferFromTopic }, getBalance);
+      off({ topics: transferToTopic }, getBalance);
+      off({ topics: approvalTopic }, getApproval);
+    };
+  }, [tokenContract, on, off, account, getBalance, getApproval]);
+
   // context value
   const value: Token = React.useMemo(() => {
     if (!tokenContract) {
@@ -181,8 +228,10 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
       balance,
       isApproved,
       approve,
+      addEventListener: on,
+      removeEventListener: off,
     };
-  }, [tokenContract, balance, isApproved, approve]);
+  }, [tokenContract, balance, isApproved, approve, on, off]);
 
   return (
     <TokenContext.Provider value={value}>{children}</TokenContext.Provider>
