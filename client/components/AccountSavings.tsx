@@ -3,6 +3,7 @@ import { BankContext } from "../context/BankContext";
 import styles from "../styles/Home.module.css";
 import { withFormAmount } from "../utils/form";
 import AmountForm from "./AmountForm";
+import DateTime from "./Date";
 import Loading from "./Loading";
 import TokenAmount from "./TokenAmount";
 
@@ -16,6 +17,15 @@ export default function AccountSavings() {
       <p className={styles.tokenAmount}>
         {!accountInfo?.savings && <Loading />}
         {accountInfo?.savings && <TokenAmount value={accountInfo.savings} />}
+      </p>
+
+      <p className={styles.savingsDate}>
+        {!accountInfo?.savingsDate && <Loading />}
+        {accountInfo?.savingsDate && (
+          <>
+            Savings Date: <DateTime value={accountInfo.savingsDate} />
+          </>
+        )}
       </p>
 
       <div className={styles.grid}>
