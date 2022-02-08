@@ -3,6 +3,7 @@ import { BankContext } from "../context/BankContext";
 import styles from "../styles/Home.module.css";
 import { withFormAmount } from "../utils/form";
 import AmountForm from "./AmountForm";
+import Loading from "./Loading";
 import TokenAmount from "./TokenAmount";
 
 export default function AccountBalance() {
@@ -13,6 +14,7 @@ export default function AccountBalance() {
       <h2>Account balance</h2>
 
       <p className={styles.tokenAmount}>
+        {!accountInfo?.balance && <Loading />}
         {accountInfo?.balance && <TokenAmount value={accountInfo.balance} />}
       </p>
 
