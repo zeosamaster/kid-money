@@ -9,12 +9,12 @@ export default function AccountSavings() {
   const { save, unsave, accountInfo } = React.useContext(BankContext);
 
   return (
-    <>
+    <div className={styles.accountSection}>
       <h2>Account savings</h2>
 
-      <span className={styles.tokenAmount}>
+      <p className={styles.tokenAmount}>
         {accountInfo?.savings && <TokenAmount value={accountInfo.savings} />}
-      </span>
+      </p>
 
       <div className={styles.grid}>
         <div className={styles.card}>
@@ -29,6 +29,6 @@ export default function AccountSavings() {
           <AmountForm onSubmit={withFormAmount(unsave)} />
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -9,12 +9,12 @@ export default function AccountBalance() {
   const { deposit, withdraw, accountInfo } = React.useContext(BankContext);
 
   return (
-    <>
+    <div className={styles.accountSection}>
       <h2>Account balance</h2>
 
-      <span className={styles.tokenAmount}>
+      <p className={styles.tokenAmount}>
         {accountInfo?.balance && <TokenAmount value={accountInfo.balance} />}
-      </span>
+      </p>
 
       <div className={styles.grid}>
         <div className={styles.card}>
@@ -29,6 +29,6 @@ export default function AccountBalance() {
           <AmountForm onSubmit={withFormAmount(withdraw)} />
         </div>
       </div>
-    </>
+    </div>
   );
 }

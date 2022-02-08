@@ -5,27 +5,35 @@
   width: 160px;
 }
 
-.connectWallet {
-  width: 100%;
-  font-size: 1rem;
-  padding: 0.75rem;
-  font-weight: bold;
-}
-
-.address,
-.tokenAmount {
-  width: 100%;
+.card {
+  height: 3rem;
   font-size: 1rem;
   padding: 0.75rem;
   margin: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   background: #81e6d9;
   border-radius: 5px;
   text-align: center;
 }
 
-.tokenAmount {
+.card + .card {
   margin-top: 1rem;
+}
+
+.connectWallet {
+  padding: 0;
+}
+
+.connectWallet > button {
+  height: 100%;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.address {
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

@@ -35,6 +35,16 @@
     Bitstream Vera Sans Mono, Courier New, monospace;
 }
 
+.accountSection {
+  text-align: center;
+  padding-bottom: 2rem;
+}
+
+.accountSection + .accountSection {
+  border-top: 2px lightgrey solid;
+  padding-top: 2rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 320px));
@@ -42,17 +52,14 @@
   grid-column-gap: 2rem;
   grid-row-gap: 2rem;
   max-width: 800px;
-  padding-bottom: 4rem;
   margin: 2rem 0;
-  border-bottom: 2px lightgrey solid;
-}
-
-.grid:last-child {
-  border-bottom: 0;
 }
 
 .tokenAmount {
   font-size: 2rem;
+  margin: 1rem 0;
+  height: 2rem;
+  line-height: 2rem;
 }
 
 .card {

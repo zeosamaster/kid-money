@@ -8,7 +8,7 @@ export default function AccountCompound() {
   const { compound } = React.useContext(BankContext);
 
   return (
-    <>
+    <div className={styles.accountSection}>
       <h2>Compounding</h2>
       <div className={styles.grid}>
         <div className={styles.card} style={{ gridColumn: "1 / span 2" }}>
@@ -17,6 +17,6 @@ export default function AccountCompound() {
           <Form onSubmit={withForm(compound)} />
         </div>
       </div>
-    </>
+    </div>
   );
 }

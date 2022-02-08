@@ -10,16 +10,21 @@ export default function Wallet() {
   const { account } = React.useContext(WalletContext);
   const { balance } = React.useContext(TokenContext);
 
+  const addressCardClass = [
+    walletStyles.card,
+    ...(account === null ? [walletStyles.connectWallet] : []),
+  ].join(" ");
+
   return (
     <div className={walletStyles.container}>
-      {account === null && <ConnectWallet />}
-      {account !== null && <WalletAddress address={account} />}
+      <div className={addressCardClass}>
+        {account === null && <ConnectWallet />}
+        {account !== null && <WalletAddress address={account} />}
+      </div>
 
-      {balance !== null && (
-        <p className={walletStyles.tokenAmount}>
-          <TokenAmount value={balance} />
-        </p>
-      )}
+      <div className={walletStyles.card}>
+        {balance !== null && <TokenAmount value={balance} />}
+      </div>
     </div>
   );
 }
