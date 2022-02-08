@@ -1,9 +1,20 @@
 import { ethers } from "ethers";
 import React, { PropsWithChildren } from "react";
 import BankContract from "../contracts/Bank.json";
+import useContractEventListeners, {
+  ContractEventListeners,
+} from "../hooks/useContractEventListeners";
 import { getContract } from "../utils/metamask";
 import { TokenContext } from "./TokenContext";
 import { WalletContext } from "./WalletContext";
+
+export enum BankEvent {
+  DEPOSIT = "Deposit",
+  WITHDRAW = "Withdraw",
+  SAVE = "Save",
+  UNSAVE = "Unsave",
+  COMPOUND = "Compound",
+}
 
 interface AccountInfo {
   balance: ethers.BigNumber;
@@ -11,7 +22,7 @@ interface AccountInfo {
   savingsDate: ethers.BigNumber;
 }
 
-interface Bank {
+interface Bank extends ContractEventListeners<BankEvent> {
   accountInfo: AccountInfo | null;
   deposit: (amount: number) => Promise<void>;
   withdraw: (amount: number) => Promise<void>;
@@ -27,6 +38,8 @@ const initialBank: Bank = {
   save: () => Promise.reject(),
   unsave: () => Promise.reject(),
   compound: () => Promise.reject(),
+  addEventListener: () => {},
+  removeEventListener: () => {},
 };
 
 export const BankContext = React.createContext<Bank>(initialBank);
@@ -40,6 +53,7 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
   const [accountInfo, setAccountInfo] = React.useState<AccountInfo | null>(
     null
   );
+  const { on, off } = useContractEventListeners<BankEvent>(bankContract);
 
   // bank contract
   const getBankContract = React.useCallback(async () => {
@@ -190,6 +204,30 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
     }
   }, [bankContract]);
 
+  // listen to events
+  React.useEffect(() => {
+    if (!bankContract || !account) {
+      return;
+    }
+
+    const topicsToSubscribe = [
+      ethers.utils.id("Deposit(address,uint256)"),
+      ethers.utils.id("Withdraw(address,uint256)"),
+      ethers.utils.id("Save(address,uint256)"),
+      ethers.utils.id("Unsave(address,uint256)"),
+      ethers.utils.id("Compound(address,uint256)"),
+    ];
+    const eventFilter = {
+      topics: [topicsToSubscribe, ethers.utils.hexZeroPad(account, 32)],
+    };
+
+    on(eventFilter, getAccountInfo);
+
+    return () => {
+      off(eventFilter, getAccountInfo);
+    };
+  }, [bankContract, on, off, account, getAccountInfo]);
+
   // context value
   const value: Bank = React.useMemo(() => {
     if (!bankContract) {
@@ -203,8 +241,20 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
       save,
       unsave,
       compound,
+      addEventListener: on,
+      removeEventListener: off,
     };
-  }, [bankContract, accountInfo, deposit, withdraw, save, unsave, compound]);
+  }, [
+    bankContract,
+    accountInfo,
+    deposit,
+    withdraw,
+    save,
+    unsave,
+    compound,
+    on,
+    off,
+  ]);
 
   return <BankContext.Provider value={value}>{children}</BankContext.Provider>;
 }
