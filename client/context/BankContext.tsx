@@ -47,7 +47,7 @@ export const BankContext = React.createContext<Bank>(initialBank);
 export function BankContextProvider({ children }: PropsWithChildren<{}>) {
   const { networkId, supportedNetwork, account } =
     React.useContext(WalletContext);
-  const { isApproved, approve } = React.useContext(TokenContext);
+  const { allowance, approve } = React.useContext(TokenContext);
   const [bankContract, setBankContract] =
     React.useState<ethers.Contract | null>(null);
   const [accountInfo, setAccountInfo] = React.useState<AccountInfo | null>(
@@ -126,18 +126,19 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
           throw Error("Bank contract unavailable");
         }
 
-        if (!isApproved) {
+        const bigNumberAmount = ethers.utils.parseUnits(amount.toString(), 18);
+
+        if (!allowance || allowance.lt(bigNumberAmount)) {
           await approve();
         }
 
-        const bigNumberAmount = ethers.utils.parseUnits(amount.toString(), 18);
         await bankContract.deposit(bigNumberAmount);
       } catch (e) {
         console.error("Unexpected error depositing:", e);
         throw e;
       }
     },
-    [bankContract, isApproved, approve]
+    [bankContract, approve, allowance]
   );
 
   const withdraw = React.useCallback(

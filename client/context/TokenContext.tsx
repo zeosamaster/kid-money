@@ -15,13 +15,13 @@ export enum TokenEvent {
 
 interface Token extends ContractEventListeners<TokenEvent> {
   balance: ethers.BigNumber | null;
-  isApproved: boolean;
+  allowance: ethers.BigNumber | null;
   approve: () => Promise<void>;
 }
 
 const initialToken: Token = {
   balance: null,
-  isApproved: false,
+  allowance: null,
   approve: () => Promise.reject(),
   addEventListener: () => {},
   removeEventListener: () => {},
@@ -35,7 +35,9 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
   const [tokenContract, setTokenContract] =
     React.useState<ethers.Contract | null>(null);
   const [balance, setBalance] = React.useState<ethers.BigNumber | null>(null);
-  const [isApproved, setIsApproved] = React.useState<boolean>(false);
+  const [allowance, setAllowance] = React.useState<ethers.BigNumber | null>(
+    null
+  );
   const { on, off } = useContractEventListeners<TokenEvent>(tokenContract);
 
   // token contract
@@ -69,7 +71,7 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
     } else {
       setTokenContract(null);
       setBalance(null);
-      setIsApproved(false);
+      setAllowance(null);
     }
   }, [getTokenContract, supportedNetwork]);
 
@@ -103,7 +105,7 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
   }, [getBalance, tokenContract, account]);
 
   // check approval
-  const getApproval = React.useCallback(async () => {
+  const getAllowance = React.useCallback(async () => {
     try {
       if (!supportedNetwork) {
         return;
@@ -131,18 +133,19 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
       }
 
       const value = await tokenContract.allowance(account, bankContractAddress);
-      setIsApproved(value.gt(0));
+
+      setAllowance(value);
     } catch (e) {
-      setIsApproved(false);
+      setAllowance(null);
       console.error("Unexpected error getting token approval:", e);
     }
   }, [tokenContract, supportedNetwork, networkId, account]);
 
   React.useEffect(() => {
     if (networkId && tokenContract && account) {
-      getApproval();
+      getAllowance();
     }
-  }, [getApproval, networkId, tokenContract, account]);
+  }, [getAllowance, networkId, tokenContract, account]);
 
   // approve
   const approve = React.useCallback(async () => {
@@ -175,12 +178,12 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
 
       await tx.wait();
 
-      setIsApproved(true);
+      await getAllowance();
     } catch (e) {
       console.error("Unexpected error approving token spending:", e);
       throw e;
     }
-  }, [tokenContract, supportedNetwork, networkId]);
+  }, [tokenContract, supportedNetwork, networkId, getAllowance]);
 
   // listen to events
   React.useEffect(() => {
@@ -209,14 +212,14 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
 
     on({ topics: transferFromTopic }, getBalance);
     on({ topics: transferToTopic }, getBalance);
-    on({ topics: approvalTopic }, getApproval);
+    on({ topics: approvalTopic }, getAllowance);
 
     return () => {
       off({ topics: transferFromTopic }, getBalance);
       off({ topics: transferToTopic }, getBalance);
-      off({ topics: approvalTopic }, getApproval);
+      off({ topics: approvalTopic }, getAllowance);
     };
-  }, [tokenContract, on, off, account, getBalance, getApproval]);
+  }, [tokenContract, on, off, account, getBalance, getAllowance]);
 
   // context value
   const value: Token = React.useMemo(() => {
@@ -226,12 +229,12 @@ export function TokenContextProvider({ children }: PropsWithChildren<{}>) {
 
     return {
       balance,
-      isApproved,
+      allowance,
       approve,
       addEventListener: on,
       removeEventListener: off,
     };
-  }, [tokenContract, balance, isApproved, approve, on, off]);
+  }, [tokenContract, balance, allowance, approve, on, off]);
 
   return (
     <TokenContext.Provider value={value}>{children}</TokenContext.Provider>
