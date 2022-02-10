@@ -32,13 +32,19 @@ export default function AccountSavings() {
         <div className={styles.card}>
           <h3>💵 Save</h3>
           <p>Save your tokens to get even more tokens</p>
-          <AmountForm onSubmit={withFormAmount(save)} />
+          <AmountForm
+            onSubmit={withFormAmount(save)}
+            max={accountInfo?.balance}
+          />
         </div>
 
         <div className={styles.card}>
           <h3>💴 Unsave</h3>
           <p>Unsave your tokens so you can decide what else to do with them</p>
-          <AmountForm onSubmit={withFormAmount(unsave)} />
+          <AmountForm
+            onSubmit={withFormAmount(unsave)}
+            max={accountInfo?.savings}
+          />
         </div>
       </div>
     </div>
