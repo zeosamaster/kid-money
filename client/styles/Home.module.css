@@ -35,6 +35,29 @@
     Bitstream Vera Sans Mono, Courier New, monospace;
 }
 
+.stickyCorner {
+  position: fixed;
+  right: 2rem;
+  top: 2rem;
+  width: 160px;
+}
+
+.flags {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.flag {
+  cursor: pointer;
+}
+
+.flag + .flag {
+  margin-left: 0.5rem;
+}
+
 .accountSection {
   text-align: center;
   padding-bottom: 2rem;
