@@ -8,7 +8,8 @@ import Loading from "./Loading";
 import TokenAmount from "./TokenAmount";
 
 export default function AccountSavings() {
-  const { save, unsave, accountInfo } = React.useContext(BankContext);
+  const { save, unsave, accountInfo, bankConfigs } =
+    React.useContext(BankContext);
 
   return (
     <div className={styles.accountSection}>
@@ -27,6 +28,17 @@ export default function AccountSavings() {
           </>
         )}
       </p>
+
+      <p className={styles.unlockDate}></p>
+      {!accountInfo?.savingsDate && !bankConfigs?.compoundPeriod && <Loading />}
+      {accountInfo?.savingsDate && bankConfigs?.compoundPeriod && (
+        <>
+          Unlock Date:{" "}
+          <DateTime
+            value={accountInfo.savingsDate.add(bankConfigs.compoundPeriod)}
+          />
+        </>
+      )}
 
       <div className={styles.grid}>
         <div className={styles.card}>

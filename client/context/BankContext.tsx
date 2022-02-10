@@ -22,8 +22,15 @@ interface AccountInfo {
   savingsDate: ethers.BigNumber;
 }
 
+interface BankConfigs {
+  compoundPeriod: ethers.BigNumber;
+  compoundPercentage: number;
+  maxCompoundReturn: ethers.BigNumber;
+}
+
 interface Bank extends ContractEventListeners<BankEvent> {
   accountInfo: AccountInfo | null;
+  bankConfigs: BankConfigs | null;
   deposit: (amount: number) => Promise<void>;
   withdraw: (amount: number) => Promise<void>;
   save: (amount: number) => Promise<void>;
@@ -33,6 +40,7 @@ interface Bank extends ContractEventListeners<BankEvent> {
 
 const initialBank: Bank = {
   accountInfo: null,
+  bankConfigs: null,
   deposit: () => Promise.reject(),
   withdraw: () => Promise.reject(),
   save: () => Promise.reject(),
@@ -51,6 +59,9 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
   const [bankContract, setBankContract] =
     React.useState<ethers.Contract | null>(null);
   const [accountInfo, setAccountInfo] = React.useState<AccountInfo | null>(
+    null
+  );
+  const [bankConfigs, setBankConfigs] = React.useState<BankConfigs | null>(
     null
   );
   const { on, off } = useContractEventListeners<BankEvent>(bankContract);
@@ -117,6 +128,38 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
       getAccountInfo();
     }
   }, [getAccountInfo, bankContract, account]);
+
+  // bank configs
+  const getBankConfigs = React.useCallback(async () => {
+    try {
+      if (!supportedNetwork) {
+        return;
+      }
+
+      if (!bankContract) {
+        throw Error("Bank contract unavailable");
+      }
+
+      const compoundPeriod = await bankContract.compoundPeriod();
+      const compoundPercentage = await bankContract.compoundPercentage();
+      const maxCompoundReturn = await bankContract.maxCompoundReturn();
+
+      setBankConfigs({
+        compoundPeriod,
+        compoundPercentage: compoundPercentage.toNumber(),
+        maxCompoundReturn,
+      });
+    } catch (e) {
+      setBankConfigs(null);
+      console.error("Unexpected error getting bank account info:", e);
+    }
+  }, [supportedNetwork, bankContract]);
+
+  React.useEffect(() => {
+    if (bankContract) {
+      getBankConfigs();
+    }
+  }, [getBankConfigs, bankContract]);
 
   // bank user methods
   const deposit = React.useCallback(
@@ -237,6 +280,7 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
 
     return {
       accountInfo,
+      bankConfigs,
       deposit,
       withdraw,
       save,
@@ -248,6 +292,7 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
   }, [
     bankContract,
     accountInfo,
+    bankConfigs,
     deposit,
     withdraw,
     save,
