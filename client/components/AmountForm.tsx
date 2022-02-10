@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import React from "react";
+import { I18nContext } from "../context/I18nContext";
 import formStyles from "../styles/Form.module.css";
 import Form from "./Form";
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function AmountForm({ onSubmit, max }: Props) {
+  const _ = React.useContext(I18nContext);
   const input = React.useRef<HTMLInputElement>(null);
   const onMax = React.useCallback(
     (e: any) => {
@@ -39,7 +41,7 @@ export default function AmountForm({ onSubmit, max }: Props) {
         />
         {max && (
           <button className={formStyles.maxButton} onClick={onMax}>
-            MAX
+            {_("INPUT.MAX")}
           </button>
         )}
       </div>

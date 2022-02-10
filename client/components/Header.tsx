@@ -1,16 +1,20 @@
 import Image from "next/image";
+import React from "react";
+import { I18nContext } from "../context/I18nContext";
 import styles from "../styles/Home.module.css";
 import Wallet from "./Wallet";
 
 export default function Header() {
+  const _ = React.useContext(I18nContext);
+
   return (
     <>
-      <h1 className={styles.title}>Welcome to Kid Money!</h1>
+      <h1 className={styles.title}>{_("HEADER.TITLE")}</h1>
 
       <Wallet />
 
       <p className={styles.description}>
-        Here you&apos;ll be able to manage your money:
+        {_("HEADER.DESCRIPTION")}
         <br />
         <Image
           height={24}
@@ -18,18 +22,19 @@ export default function Header() {
           alt="deposit"
           src="/icons/deposit.svg"
         />{" "}
-        deposit +{" "}
+        {_("HEADER.ACTIONS.DEPOSIT")} +{" "}
         <Image
           height={24}
           width={24}
           alt="withdraw"
           src="/icons/withdraw.svg"
         />{" "}
-        withdraw
+        {_("HEADER.ACTIONS.WITHDRAW")}
         <br />
-        <Image height={24} width={24} alt="save" src="/icons/save.svg" /> save +{" "}
+        <Image height={24} width={24} alt="save" src="/icons/save.svg" />{" "}
+        {_("HEADER.ACTIONS.SAVE")} +{" "}
         <Image height={24} width={24} alt="compound" src="/icons/unsave.svg" />{" "}
-        unsave
+        {_("HEADER.ACTIONS.UNSAVE")}
         <br />
         <Image
           height={24}
@@ -37,7 +42,7 @@ export default function Header() {
           alt="compound"
           src="/icons/compound.svg"
         />{" "}
-        compound
+        {_("HEADER.ACTIONS.COMPOUND")}
       </p>
     </>
   );

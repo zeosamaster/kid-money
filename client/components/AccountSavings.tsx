@@ -1,5 +1,6 @@
 import React from "react";
 import { BankContext } from "../context/BankContext";
+import { I18nContext } from "../context/I18nContext";
 import styles from "../styles/Home.module.css";
 import { withFormAmount } from "../utils/form";
 import AmountForm from "./AmountForm";
@@ -8,6 +9,7 @@ import Loading from "./Loading";
 import TokenAmount from "./TokenAmount";
 
 export default function AccountSavings() {
+  const _ = React.useContext(I18nContext);
   const { save, unsave, accountInfo, bankConfigs } =
     React.useContext(BankContext);
 
@@ -22,7 +24,7 @@ export default function AccountSavings() {
 
   return (
     <div className={styles.accountSection}>
-      <h2>Account savings</h2>
+      <h2>{_("ACCOUNT_SAVINGS.TITLE")}</h2>
 
       <p className={styles.tokenAmount}>
         {!savings && <Loading />}
@@ -33,7 +35,8 @@ export default function AccountSavings() {
         {!savingsDate && <Loading />}
         {savingsDate && (
           <>
-            Savings Date: <DateTime value={savingsDate} />
+            {_("ACCOUNT_SAVINGS.SAVINGS_DATE")}:{" "}
+            <DateTime value={savingsDate} />
           </>
         )}
       </p>
@@ -42,20 +45,20 @@ export default function AccountSavings() {
       {!unlockDate && <Loading />}
       {unlockDate && (
         <>
-          Unlock Date: <DateTime value={unlockDate} />
+          {_("ACCOUNT_SAVINGS.UNLOCK_DATE")}: <DateTime value={unlockDate} />
         </>
       )}
 
       <div className={styles.grid}>
         <div className={styles.card}>
-          <h3>💵 Save</h3>
-          <p>Save your tokens to get even more tokens</p>
+          <h3>💵 {_("ACCOUNT_SAVINGS.SAVE.HEADER")}</h3>
+          <p>{_("ACCOUNT_SAVINGS.SAVE.DESCRIPTION")}</p>
           <AmountForm onSubmit={withFormAmount(save)} max={balance} />
         </div>
 
         <div className={styles.card}>
-          <h3>💴 Unsave</h3>
-          <p>Unsave your tokens so you can decide what else to do with them</p>
+          <h3>💴 {_("ACCOUNT_SAVINGS.UNSAVE.HEADER")}</h3>
+          <p>{_("ACCOUNT_SAVINGS.UNSAVE.DESCRIPTION")}</p>
           <AmountForm onSubmit={withFormAmount(unsave)} max={savings} />
         </div>
       </div>
