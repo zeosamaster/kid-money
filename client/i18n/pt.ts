@@ -2,7 +2,7 @@ const translations = {
   APP_TITLE: "Kid Money",
 
   HEADER: {
-    TITLE: "Kid Money!",
+    TITLE: "Kid Money",
     DESCRIPTION: "Aqui vais poder gerir o teu dinheiro:",
     ACTIONS: {
       DEPOSIT: "depositar",
