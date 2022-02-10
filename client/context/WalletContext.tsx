@@ -1,4 +1,5 @@
 import React, { PropsWithChildren } from "react";
+import NetworkAlert from "../components/NetworkAlert";
 import {
   getNetworkId,
   getConnectedAccount,
@@ -6,6 +7,7 @@ import {
   connectAccount,
   syncMetamask,
 } from "../utils/metamask";
+import { supportedNetworks } from "../utils/networks";
 
 interface Wallet {
   networkId: string | null;
@@ -19,10 +21,6 @@ const initialState: Wallet = {
   supportedNetwork: false,
   account: null,
   connect: () => Promise.reject(),
-};
-
-export const supportedNetworks: Record<string, string> = {
-  "4": "Rinkeby",
 };
 
 export const WalletContext = React.createContext<Wallet>(initialState);
@@ -76,6 +74,8 @@ export function WalletContextProvider({ children }: PropsWithChildren<{}>) {
   }, [setAccount]);
 
   // context value
+  const supportedNetwork = !!networkId && !!supportedNetworks[networkId];
+
   const value: Wallet = React.useMemo(() => {
     if (!networkId) {
       return initialState;
@@ -83,11 +83,20 @@ export function WalletContextProvider({ children }: PropsWithChildren<{}>) {
 
     return {
       account,
-      supportedNetwork: !!supportedNetworks[networkId],
+      supportedNetwork,
       networkId,
       connect,
     };
-  }, [account, networkId, connect]);
+  }, [account, supportedNetwork, networkId, connect]);
+
+  if (networkId !== null && !supportedNetwork) {
+    return (
+      <WalletContext.Provider value={value}>
+        <NetworkAlert />
+        {children}
+      </WalletContext.Provider>
+    );
+  }
 
   return (
     <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
