@@ -70,7 +70,11 @@ contract Bank {
     event Withdraw(address indexed account, uint256 amount);
     event Save(address indexed account, uint256 amount);
     event Unsave(address indexed account, uint256 amount);
-    event Compound(address indexed account, uint256 amount);
+    event Compound(
+        address indexed account,
+        string indexed compoundType,
+        uint256 amount
+    );
 
     // ------------------------------------------------------------------
     // modifiers
@@ -107,6 +111,22 @@ contract Bank {
      */
     function getToken() internal view returns (IERC20 _token) {
         return IERC20(tokenAddress);
+    }
+
+    /**
+     * @dev Returns the token implementation
+     * @return _compoundReturn Capped return for compounding
+     */
+    function calculateCappedCompoundReturn(uint256 savings)
+        internal
+        view
+        returns (uint256 _compoundReturn)
+    {
+        uint256 compoundValue = (savings / 100) * compoundPercentage;
+        uint256 valueWithCap = compoundValue > maxCompoundReturn
+            ? maxCompoundReturn
+            : compoundValue;
+        return valueWithCap;
     }
 
     // ------------------------------------------------------------------
@@ -197,20 +217,51 @@ contract Bank {
     }
 
     /**
-     * @dev Compound savings
+     * @dev Compound savings and save the returns
      * @dev Only allowed when savings lock period is past
      * @dev Compound value capped to maxCompoundReturn
      */
-    function compound() public isLockPeriodPast {
-        uint256 compoundValue = (accounts[msg.sender].savings / 100) *
-            compoundPercentage;
-        uint256 valueWithCap = compoundValue > maxCompoundReturn
-            ? maxCompoundReturn
-            : compoundValue;
+    function compoundAndSave() public isLockPeriodPast {
+        uint256 valueWithCap = calculateCappedCompoundReturn(
+            accounts[msg.sender].savings
+        );
         accounts[msg.sender].savings += valueWithCap;
         accounts[msg.sender].savingsDate = block.timestamp;
 
-        emit Compound(msg.sender, valueWithCap);
+        emit Compound(msg.sender, "Save", valueWithCap);
+    }
+
+    /**
+     * @dev Compound savings and withdraw the returns
+     * @dev Only allowed when savings lock period is past
+     * @dev Compound value capped to maxCompoundReturn
+     */
+    function compoundAndWithdrawReturns() public isLockPeriodPast {
+        uint256 valueWithCap = calculateCappedCompoundReturn(
+            accounts[msg.sender].savings
+        );
+        accounts[msg.sender].balance += valueWithCap;
+        accounts[msg.sender].savingsDate = block.timestamp;
+
+        emit Compound(msg.sender, "WithdrawReturns", valueWithCap);
+    }
+
+    /**
+     * @dev Compound savings and withdraw savings and returns
+     * @dev Only allowed when savings lock period is past
+     * @dev Compound value capped to maxCompoundReturn
+     */
+    function compoundAndWithdrawAll() public isLockPeriodPast {
+        uint256 valueWithCap = calculateCappedCompoundReturn(
+            accounts[msg.sender].savings
+        );
+        accounts[msg.sender].balance +=
+            accounts[msg.sender].savings +
+            valueWithCap;
+        accounts[msg.sender].savings = 0;
+        accounts[msg.sender].savingsDate = block.timestamp;
+
+        emit Compound(msg.sender, "WithdrawAll", valueWithCap);
     }
 
     // ------------------------------------------------------------------

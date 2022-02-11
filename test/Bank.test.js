@@ -7,6 +7,7 @@ const {
   snapshot,
   time,
 } = require("@openzeppelin/test-helpers");
+const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 
 const Token = artifacts.require("Token");
 const Bank = artifacts.require("Bank");
@@ -60,8 +61,16 @@ contract("Bank", (accounts) => {
     return bank.unsave(numberToWeiBN(amount), { from: account });
   }
 
-  function callCompound(account) {
-    return bank.compound({ from: account });
+  function callCompoundAndSave(account) {
+    return bank.compoundAndSave({ from: account });
+  }
+
+  function callCompoundAndWithdrawReturns(account) {
+    return bank.compoundAndWithdrawReturns({ from: account });
+  }
+
+  function callCompoundAndWithdrawAll(account) {
+    return bank.compoundAndWithdrawAll({ from: account });
   }
 
   // setup tests
@@ -547,7 +556,7 @@ contract("Bank", (accounts) => {
     });
   });
 
-  describe(".compound", () => {
+  describe(".compoundAndSave", () => {
     beforeEach(async () => {
       await approveToken(testUser);
 
@@ -561,7 +570,7 @@ contract("Bank", (accounts) => {
     describe("when the lock period has not finished yet", () => {
       it("fails", async () => {
         await expectRevert(
-          callCompound(testUser),
+          callCompoundAndSave(testUser),
           "Savings lock period not over yet"
         );
       });
@@ -574,13 +583,24 @@ contract("Bank", (accounts) => {
 
       describe("when the expected compound return is <= than the maximum", () => {
         it("increments the caller's savings by the expected compound return", async () => {
-          await callCompound(testUser);
+          await callCompoundAndSave(testUser);
           // balance = 40, savings = 48
 
           assert.equal(
             (await callGetSavings(testUser)).toJSON(),
             numberToWeiBN(48).toJSON(),
-            `.compound should decrement the caller's balance`
+            `.compoundAndSave should increment the caller's savings`
+          );
+        });
+
+        it("keeps the same caller's balance", async () => {
+          await callCompoundAndSave(testUser);
+          // balance = 40, savings = 48
+
+          assert.equal(
+            (await callGetBalance(testUser)).toJSON(),
+            numberToWeiBN(40).toJSON(),
+            `.compoundAndSave should keep the caller's balance`
           );
         });
       });
@@ -594,32 +614,248 @@ contract("Bank", (accounts) => {
         });
 
         it("increments the caller's savings by the maximum compound return", async () => {
-          await callCompound(testUser);
+          await callCompoundAndSave(testUser);
           // balance = 10, savings = 80
 
           assert.equal(
             (await callGetSavings(testUser)).toJSON(),
             numberToWeiBN(80).toJSON(),
-            `.compound should decrement the caller's balance`
+            `.compoundAndSave should increment the caller's savings`
+          );
+        });
+
+        it("keeps the same caller's balance", async () => {
+          await callCompoundAndSave(testUser);
+          // balance = 10, savings = 80
+
+          assert.equal(
+            (await callGetBalance(testUser)).toJSON(),
+            numberToWeiBN(10).toJSON(),
+            `.compoundAndSave should keep the caller's balance`
           );
         });
       });
 
       it("sets the caller's savings date", async () => {
-        await callCompound(testUser);
+        await callCompoundAndSave(testUser);
 
         assert.equal(
           (await callGetSavingsDate(testUser)).toJSON(),
           (await time.latest()).toJSON(),
-          `.compound should set the savings date`
+          `.compoundAndSave should set the savings date`
         );
       });
 
       it("emits a Compound event", async () => {
-        const tx = await callCompound(testUser);
+        const tx = await callCompoundAndSave(testUser);
 
         expectEvent(tx, "Compound", {
           account: testUser,
+          compoundType: web3.utils.keccak256("Save"),
+          amount: numberToWeiBN(8),
+        });
+      });
+    });
+  });
+
+  describe(".compoundAndWithdrawReturns", () => {
+    beforeEach(async () => {
+      await approveToken(testUser);
+
+      await callDeposit(testUser, 80);
+      // balance = 80, savings = 0
+
+      await callSave(testUser, 40);
+      // balance = 40, savings = 40, savingsDate = now
+    });
+
+    describe("when the lock period has not finished yet", () => {
+      it("fails", async () => {
+        await expectRevert(
+          callCompoundAndWithdrawReturns(testUser),
+          "Savings lock period not over yet"
+        );
+      });
+    });
+
+    describe("when the lock period is finished", () => {
+      beforeEach(async () => {
+        await time.increase(time.duration.days(8));
+      });
+
+      describe("when the expected compound return is <= than the maximum", () => {
+        it("increments the caller's balance by the expected compound returns", async () => {
+          await callCompoundAndWithdrawReturns(testUser);
+          // balance = 48, savings = 40
+
+          assert.equal(
+            (await callGetBalance(testUser)).toJSON(),
+            numberToWeiBN(48).toJSON(),
+            `.compoundAndWithdrawReturns should increment the caller's balance`
+          );
+        });
+
+        it("keeps the same caller's savings", async () => {
+          await callCompoundAndWithdrawReturns(testUser);
+          // balance = 48, savings = 40
+
+          assert.equal(
+            (await callGetSavings(testUser)).toJSON(),
+            numberToWeiBN(40).toJSON(),
+            `.compoundAndWithdrawReturns should keep the caller's savings`
+          );
+        });
+      });
+
+      describe("when the expected compound return is > than the maximum", () => {
+        beforeEach(async () => {
+          await callSave(testUser, 30);
+          // balance = 10, savings = 70, savingsDate = now
+
+          await time.increase(time.duration.days(8));
+        });
+
+        it("increments the caller's balance by the maximum compound returns", async () => {
+          await callCompoundAndWithdrawReturns(testUser);
+          // balance = 20, savings = 70
+
+          assert.equal(
+            (await callGetBalance(testUser)).toJSON(),
+            numberToWeiBN(20).toJSON(),
+            `.compoundAndWithdrawReturns should increment the caller's balance`
+          );
+        });
+
+        it("keeps the same caller's savings", async () => {
+          await callCompoundAndWithdrawReturns(testUser);
+          // balance = 20, savings = 70
+
+          assert.equal(
+            (await callGetSavings(testUser)).toJSON(),
+            numberToWeiBN(70).toJSON(),
+            `.compoundAndWithdrawReturns should keep the caller's savings`
+          );
+        });
+      });
+
+      it("sets the caller's savings date", async () => {
+        await callCompoundAndWithdrawReturns(testUser);
+
+        assert.equal(
+          (await callGetSavingsDate(testUser)).toJSON(),
+          (await time.latest()).toJSON(),
+          `.compoundAndWithdrawReturns should set the savings date`
+        );
+      });
+
+      it("emits a Compound event", async () => {
+        const tx = await callCompoundAndWithdrawReturns(testUser);
+
+        expectEvent(tx, "Compound", {
+          account: testUser,
+          compoundType: web3.utils.keccak256("WithdrawReturns"),
+          amount: numberToWeiBN(8),
+        });
+      });
+    });
+  });
+
+  describe(".compoundAndWithdrawAll", () => {
+    beforeEach(async () => {
+      await approveToken(testUser);
+
+      await callDeposit(testUser, 80);
+      // balance = 80, savings = 0
+
+      await callSave(testUser, 40);
+      // balance = 40, savings = 40, savingsDate = now
+    });
+
+    describe("when the lock period has not finished yet", () => {
+      it("fails", async () => {
+        await expectRevert(
+          callCompoundAndWithdrawAll(testUser),
+          "Savings lock period not over yet"
+        );
+      });
+    });
+
+    describe("when the lock period is finished", () => {
+      beforeEach(async () => {
+        await time.increase(time.duration.days(8));
+      });
+
+      describe("when the expected compound return is <= than the maximum", () => {
+        it("increments the caller's balance by the expected compound returns + savings", async () => {
+          await callCompoundAndWithdrawAll(testUser);
+          // balance = 88, savings = 0
+
+          assert.equal(
+            (await callGetBalance(testUser)).toJSON(),
+            numberToWeiBN(88).toJSON(),
+            `.compoundAndWithdrawAll should increment the caller's balance`
+          );
+        });
+
+        it("set the caller's savings to zero", async () => {
+          await callCompoundAndWithdrawAll(testUser);
+          // balance = 88, savings = 0
+
+          assert.equal(
+            (await callGetSavings(testUser)).toJSON(),
+            numberToWeiBN(0).toJSON(),
+            `.compoundAndWithdrawAll should set the caller's savings to zero`
+          );
+        });
+      });
+
+      describe("when the expected compound return is > than the maximum", () => {
+        beforeEach(async () => {
+          await callSave(testUser, 30);
+          // balance = 10, savings = 70, savingsDate = now
+
+          await time.increase(time.duration.days(8));
+        });
+
+        it("increments the caller's balance by the maximum compound returns + savings", async () => {
+          await callCompoundAndWithdrawAll(testUser);
+          // balance = 90, savings = 0
+
+          assert.equal(
+            (await callGetBalance(testUser)).toJSON(),
+            numberToWeiBN(90).toJSON(),
+            `.compoundAndWithdrawAll should increment the caller's balance`
+          );
+        });
+
+        it("sets the caller's savings to zero", async () => {
+          await callCompoundAndWithdrawAll(testUser);
+          // balance = 90, savings = 0
+
+          assert.equal(
+            (await callGetSavings(testUser)).toJSON(),
+            numberToWeiBN(0).toJSON(),
+            `.compoundAndWithdrawAll should set the caller's savings to zero`
+          );
+        });
+      });
+
+      it("sets the caller's savings date", async () => {
+        await callCompoundAndWithdrawAll(testUser);
+
+        assert.equal(
+          (await callGetSavingsDate(testUser)).toJSON(),
+          (await time.latest()).toJSON(),
+          `.compoundAndWithdrawAll should set the savings date`
+        );
+      });
+
+      it("emits a Compound event", async () => {
+        const tx = await callCompoundAndWithdrawAll(testUser);
+
+        expectEvent(tx, "Compound", {
+          account: testUser,
+          compoundType: web3.utils.keccak256("WithdrawAll"),
           amount: numberToWeiBN(8),
         });
       });
