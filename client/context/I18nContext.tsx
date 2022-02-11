@@ -17,7 +17,7 @@ export const I18nContextProvider = function ({
   const { locale, locales, defaultLocale } = useRouter();
   const translations = React.useMemo(() => {
     const realLocale = locale || defaultLocale || locales?.[0] || "en";
-    const data: Translations = require(`/i18n/${realLocale}.ts`).default;
+    const data: Translations = require(`/i18n/${realLocale}.tsx`).default;
     return data;
   }, [locale, locales, defaultLocale]);
 

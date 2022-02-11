@@ -35,7 +35,9 @@ interface Bank extends ContractEventListeners<BankEvent> {
   withdraw: (amount: number) => Promise<void>;
   save: (amount: number) => Promise<void>;
   unsave: (amount: number) => Promise<void>;
-  compound: () => Promise<void>;
+  compoundAndSave: () => Promise<void>;
+  compoundAndWithdrawReturns: () => Promise<void>;
+  compoundAndWithdrawAll: () => Promise<void>;
 }
 
 const initialBank: Bank = {
@@ -45,7 +47,9 @@ const initialBank: Bank = {
   withdraw: () => Promise.reject(),
   save: () => Promise.reject(),
   unsave: () => Promise.reject(),
-  compound: () => Promise.reject(),
+  compoundAndSave: () => Promise.reject(),
+  compoundAndWithdrawReturns: () => Promise.reject(),
+  compoundAndWithdrawAll: () => Promise.reject(),
   addEventListener: () => {},
   removeEventListener: () => {},
 };
@@ -235,15 +239,47 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
     [bankContract]
   );
 
-  const compound = React.useCallback(async () => {
+  const compoundAndSave = React.useCallback(async () => {
     try {
       if (!bankContract) {
         throw Error("Bank contract unavailable");
       }
 
-      await bankContract.compound();
+      await bankContract.compoundAndSave();
     } catch (e) {
-      console.error("Unexpected error compounding:", e);
+      console.error("Unexpected error compounding (compoundAndSave):", e);
+      throw e;
+    }
+  }, [bankContract]);
+
+  const compoundAndWithdrawReturns = React.useCallback(async () => {
+    try {
+      if (!bankContract) {
+        throw Error("Bank contract unavailable");
+      }
+
+      await bankContract.compoundAndWithdrawReturns();
+    } catch (e) {
+      console.error(
+        "Unexpected error compounding (compoundAndWithdrawReturns):",
+        e
+      );
+      throw e;
+    }
+  }, [bankContract]);
+
+  const compoundAndWithdrawAll = React.useCallback(async () => {
+    try {
+      if (!bankContract) {
+        throw Error("Bank contract unavailable");
+      }
+
+      await bankContract.compoundAndWithdrawAll();
+    } catch (e) {
+      console.error(
+        "Unexpected error compounding (compoundAndWithdrawAll):",
+        e
+      );
       throw e;
     }
   }, [bankContract]);
@@ -285,7 +321,9 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
       withdraw,
       save,
       unsave,
-      compound,
+      compoundAndSave,
+      compoundAndWithdrawReturns,
+      compoundAndWithdrawAll,
       addEventListener: on,
       removeEventListener: off,
     };
@@ -297,7 +335,9 @@ export function BankContextProvider({ children }: PropsWithChildren<{}>) {
     withdraw,
     save,
     unsave,
-    compound,
+    compoundAndSave,
+    compoundAndWithdrawReturns,
+    compoundAndWithdrawAll,
     on,
     off,
   ]);

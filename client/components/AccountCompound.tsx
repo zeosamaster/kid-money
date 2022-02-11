@@ -9,7 +9,13 @@ import TokenAmount from "./TokenAmount";
 
 export default function AccountCompound() {
   const _ = React.useContext(I18nContext);
-  const { accountInfo, bankConfigs, compound } = React.useContext(BankContext);
+  const {
+    accountInfo,
+    bankConfigs,
+    compoundAndSave,
+    compoundAndWithdrawReturns,
+    compoundAndWithdrawAll,
+  } = React.useContext(BankContext);
 
   const compoundPercentage = bankConfigs?.compoundPercentage;
   const maxCompoundReturn = bankConfigs?.maxCompoundReturn;
@@ -46,9 +52,23 @@ export default function AccountCompound() {
 
       <div className={styles.grid}>
         <div className={styles.card} style={{ gridColumn: "1 / span 2" }}>
-          <h3>💰 {_("ACCOUNT_COMPOUNDING.COMPOUND.HEADER")}</h3>
-          <p>{_("ACCOUNT_COMPOUNDING.COMPOUND.DESCRIPTION")}</p>
-          <Form onSubmit={withForm(compound)} />
+          <h3>💰 {_("ACCOUNT_COMPOUNDING.COMPOUND_SAVE.HEADER")}</h3>
+          <p>{_("ACCOUNT_COMPOUNDING.COMPOUND_SAVE.DESCRIPTION")}</p>
+          <Form onSubmit={withForm(compoundAndSave)} />
+        </div>
+      </div>
+
+      <div className={styles.grid}>
+        <div className={styles.card}>
+          <h3>💰 {_("ACCOUNT_COMPOUNDING.COMPOUND_RETURNS.HEADER")}</h3>
+          <p>{_("ACCOUNT_COMPOUNDING.COMPOUND_RETURNS.DESCRIPTION")}</p>
+          <Form onSubmit={withForm(compoundAndWithdrawReturns)} />
+        </div>
+
+        <div className={styles.card}>
+          <h3>💰 {_("ACCOUNT_COMPOUNDING.COMPOUND_ALL.HEADER")}</h3>
+          <p>{_("ACCOUNT_COMPOUNDING.COMPOUND_ALL.DESCRIPTION")}</p>
+          <Form onSubmit={withForm(compoundAndWithdrawAll)} />
         </div>
       </div>
     </div>
