@@ -10,6 +10,10 @@ let ethereumInstance: any;
 let signer: ethers.providers.JsonRpcSigner;
 let contracts: Record<string, ethers.Contract> = {};
 
+export function hasWeb3() {
+  return window.ethereum;
+}
+
 export function syncMetamask() {
   const { ethereum } = window;
 
