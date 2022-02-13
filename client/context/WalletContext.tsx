@@ -6,6 +6,7 @@ import {
   onNetworkChange,
   connectAccount,
   syncMetamask,
+  hasWeb3,
 } from "../utils/metamask";
 import { supportedNetworks } from "../utils/networks";
 
@@ -43,6 +44,10 @@ export function WalletContextProvider({ children }: PropsWithChildren<{}>) {
   }, []);
 
   React.useEffect(() => {
+    if (!hasWeb3()) {
+      return;
+    }
+
     checkNetworkId();
     onNetworkChange(() => checkNetworkId());
   }, [checkNetworkId]);
@@ -59,6 +64,10 @@ export function WalletContextProvider({ children }: PropsWithChildren<{}>) {
   }, []);
 
   React.useEffect(() => {
+    if (!hasWeb3()) {
+      return;
+    }
+
     getAccount();
   }, [getAccount]);
 
