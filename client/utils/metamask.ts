@@ -8,10 +8,15 @@ declare global {
 
 let ethereumInstance: any;
 let signer: ethers.providers.JsonRpcSigner;
+let provider: ethers.providers.Web3Provider;
 let contracts: Record<string, ethers.Contract> = {};
 
 export function hasWeb3() {
   return window.ethereum;
+}
+
+export function getProvider() {
+  return provider || new ethers.providers.Web3Provider(window.ethereum);
 }
 
 export function syncMetamask() {
@@ -23,7 +28,7 @@ export function syncMetamask() {
 
   ethereumInstance = ethereum;
 
-  const provider = new ethers.providers.Web3Provider(ethereum);
+  provider = new ethers.providers.Web3Provider(window.ethereum);
   signer = provider.getSigner();
 
   return ethereum;
