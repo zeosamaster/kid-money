@@ -123,9 +123,16 @@
   margin-left: 0.5rem;
 }
 
-@media (max-width: 600px) {
+.largeCard {
+  grid-column: 1 / span 2;
+}
+
+@media (max-width: 640px) {
   .grid {
-    width: 100%;
-    flex-direction: column;
+    grid-template-columns: repeat(1, 100%);
+  }
+
+  .largeCard {
+    grid-column: initial;
   }
 }

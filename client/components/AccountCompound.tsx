@@ -51,7 +51,7 @@ export default function AccountCompound() {
       </p>
 
       <div className={styles.grid}>
-        <div className={styles.card} style={{ gridColumn: "1 / span 2" }}>
+        <div className={[styles.card, styles.largeCard].join(" ")}>
           <h3>💰 {_("ACCOUNT_COMPOUNDING.COMPOUND_SAVE.HEADER")}</h3>
           <p>{_("ACCOUNT_COMPOUNDING.COMPOUND_SAVE.DESCRIPTION")}</p>
           <Form onSubmit={withForm(compoundAndSave)} />
