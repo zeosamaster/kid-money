@@ -1,0 +1,30 @@
+.closedMobileMenu {
+  position: absolute;
+  top: 2rem;
+  left: 1rem;
+}
+
+.opennedMobileMenu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #fafafa;
+  z-index: 1;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.menuButtonContainer {
+  position: absolute;
+  top: 2rem;
+  right: 1rem;
+}
+
+.menuButton {
+  border: 0;
+  background: 0;
+}

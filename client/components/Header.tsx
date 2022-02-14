@@ -2,8 +2,7 @@ import Image from "next/image";
 import React from "react";
 import { I18nContext } from "../context/I18nContext";
 import styles from "../styles/Home.module.css";
-import LocaleSelector from "./LocaleSelector";
-import Wallet from "./Wallet";
+import Menu from "./Menu";
 
 export default function Header() {
   const _ = React.useContext(I18nContext);
@@ -12,10 +11,7 @@ export default function Header() {
     <>
       <h1 className={styles.title}>{_("HEADER.TITLE")}</h1>
 
-      <div className={styles.stickyCorner}>
-        <Wallet />
-        <LocaleSelector />
-      </div>
+      <Menu />
 
       <p className={styles.description}>
         {_("HEADER.DESCRIPTION")}
