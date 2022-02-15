@@ -1,4 +1,5 @@
 import React from "react";
+import { DataFeedContext } from "../context/DataFeedContext";
 import { TokenContext } from "../context/TokenContext";
 import { WalletContext } from "../context/WalletContext";
 import walletStyles from "../styles/Wallet.module.css";
@@ -11,6 +12,7 @@ import WalletAddress from "./WalletAddress";
 export default function Wallet() {
   const { supportedNetwork, account } = React.useContext(WalletContext);
   const { balance } = React.useContext(TokenContext);
+  const { feed, answer } = React.useContext(DataFeedContext);
   const [accountName, setAccountName] = React.useState<string | null>(null);
 
   const isLoading = !supportedNetwork;
@@ -37,6 +39,9 @@ export default function Wallet() {
     }
   }, [account]);
 
+  const [token1, token2] = feed.replace(/usd/, "KM").split("-");
+  const feedName = `${token2}/${token1}`.toUpperCase();
+
   return (
     <div className={walletStyles.container}>
       <div className={addressCardClass}>
@@ -49,6 +54,15 @@ export default function Wallet() {
       <div className={walletStyles.card}>
         {balance === null && <Loading />}
         {balance !== null && <TokenAmount value={balance} />}
+      </div>
+
+      <div className={walletStyles.card}>
+        {answer === null && <Loading />}
+        {answer !== null && (
+          <>
+            {answer.toFixed(2)} {feedName}
+          </>
+        )}
       </div>
     </div>
   );

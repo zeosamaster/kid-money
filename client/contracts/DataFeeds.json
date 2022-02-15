@@ -1,0 +1,11 @@
+{
+  "abi": [
+    "function latestAnswer() external view returns (int256)",
+    "function decimals() external view returns (int256)"
+  ],
+  "networks": {
+    "4": {
+      "eth-usd": "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e"
+    }
+  }
+}
